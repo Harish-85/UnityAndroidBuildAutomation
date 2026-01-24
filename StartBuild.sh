@@ -44,6 +44,7 @@ cat > "$CONFIG_FILE" <<EOL
     # build_config.env - Edit these values
     UNITY_PATH=""
     REPO_URL=""
+    BRANCH=""
     DISCORD_HOOK=""
     PACKAGE_NAME=""
     KEYSTORE_PWD=""
@@ -81,11 +82,16 @@ EOL
         echo "Error: GP_SERVICE is not set in $CONFIG_FILE"
         ERRORS=$((ERRORS+1))
     fi
+    if [ -z "$BRANCH" ]; then
+        echo "Error: BRANCH is not set in $CONFIG_FILE"
+        ERRORS=$((ERRORS+1))
+    fi
 
     if [ "$ERRORS" -gt 0 ]; then
         echo "Please fix $CONFIG_FILE and re-run the script."
         exit 1
     fi
+
 }
 
 
@@ -97,6 +103,7 @@ HandleConfigFile
 
 echo "Using Unity at: $UNITY_PATH"
 echo "Repo URL: $REPO_URL"
+echo "BRANCH: $BRANCH"
 echo "Dicord URL: $DISCORD_HOOK"
 echo "Keystore pwd: " $KEYSTORE_PWD
 echo "GP_SERVICE path: " $GP_SERVICE
@@ -105,7 +112,7 @@ echo "PACKAGE_NAME : " $PACKAGE_NAME
 BUILD_NAME="build_$(date +%b_%d_%Y_%I-%M-%S_%p).apk"
 mkdir -p builds
 echo "starting build"
-OUTPUT=$(./BuildUnity.sh "$PWD/builds/$BUILD_NAME" "$UNITY_PATH" "$REPO_URL" "$KEYSTORE_PWD" 3>&1)
+OUTPUT=$(./BuildUnity.sh "$PWD/builds/$BUILD_NAME" "$UNITY_PATH" "$REPO_URL" "$BRANCH" "$KEYSTORE_PWD" 3>&1)
 if [ $? -eq 0 ]; then
     eval "$OUTPUT"
     chmod a+x ./UploadBuild.sh

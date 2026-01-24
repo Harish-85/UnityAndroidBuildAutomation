@@ -10,7 +10,8 @@ echo "Starting Build Check"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 UNITY_PATH="$2"
 REPO_URL="$3"
-KEYSTORE_PWD="$4"
+BRANCH_NAME="$4"
+KEYSTORE_PWD="$5"
 PROJECT_PATH="$SCRIPT_DIR/ProjectFiles"
 STATE_FILE="$SCRIPT_DIR/last_commit.txt"
 OUTPUT_FILE="$1"
@@ -56,11 +57,11 @@ if [ ! -d ".git" ]; then
     git clone $REPO_URL .
 fi
 echo "Fetching changes"
-git fetch origin "main"
+git fetch origin "$BRANCH_NAME"
 
-LATEST_COMMIT=$(git rev-parse "origin/main")
-export LATEST_COMMIT_NAME=$(git log -n 1 origin/main --pretty=format:%s)
-export LATEST_COMMIT_BODY=$(git log -n 1 origin/main --pretty=format:%b)
+LATEST_COMMIT=$(git rev-parse "origin/$BRANCH_NAME")
+export LATEST_COMMIT_NAME=$(git log -n 1 origin/"$BRANCH_NAME" --pretty=format:%s)
+export LATEST_COMMIT_BODY=$(git log -n 1 origin/"$BRANCH_NAME" --pretty=format:%b)
 
 if [ ! -f "$STATE_FILE" ]; then
   echo "$LATEST_COMMIT" > "$STATE_FILE"
@@ -72,8 +73,7 @@ LAST_BUILT=$(cat "$STATE_FILE")
 
 if [ "$LATEST_COMMIT" != "$LAST_BUILT" ]; then
     echo "New commit detected $LATEST_COMMIT"
-    git reset --hard "origin/main"
-
+    git reset --hard "origin/$BRANCH_NAME"
     PerformBuild
 
     echo "$LATEST_COMMIT" > "$STATE_FILE"
