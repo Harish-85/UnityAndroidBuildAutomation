@@ -4,6 +4,26 @@ set -e
 
 #gcloud auth activate-service-account --key-file=gpservice.json
 #export ACCESS_TOKEN=$(gcloud auth print-access-token)
+LOCK_FILE="LockFile"
+HandleLock(){
+    if [ -f "$LOCK_FILE" ]; then
+        OLD_PID=$(cat "$LOCK_FILE")
+
+        if ps -p "$OLD_PID" > /dev/null 2>&1; then
+            echo "BUILD ALREADY RUNNING PID: $OLD_PID"
+            exit 1
+        else
+            echo "STALE LOCK DETECTED . REMOVING..."
+            rm -f "$LOCK_FILE"
+        fi
+    fi
+    echo $$ > "$LOCK_FILE"
+}
+
+CleanupLock(){
+    echo "REMOVING LOCK FILE"
+    rm -f "$LOCK_FILE"
+}
 
 SendDiscordMsg(){
     local MESSAGE="$1"
@@ -68,7 +88,12 @@ EOL
     fi
 }
 
+
+
+HandleLock
+trap CleanupLock EXIT INT TERM
 HandleConfigFile
+
 
 echo "Using Unity at: $UNITY_PATH"
 echo "Repo URL: $REPO_URL"
