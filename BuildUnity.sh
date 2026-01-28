@@ -39,7 +39,6 @@ cat >&3 <<EOF
         LATEST_COMMIT_NAME=$(printf '%q' "$LATEST_COMMIT_NAME")
         LATEST_COMMIT_BODY=$(printf '%q' "$LATEST_COMMIT_BODY")
 EOF
-    exit 0
 
 else
     echo "❌ Unity build failed with exit code $BUILD_EXIT"
@@ -70,6 +69,8 @@ if [ ! -f "$STATE_FILE" ]; then
 fi
 
 LAST_BUILT=$(cat "$STATE_FILE")
+echo $LAST_BUILT
+echo $LATEST_COMMIT
 
 if [ "$LATEST_COMMIT" != "$LAST_BUILT" ]; then
     echo "New commit detected $LATEST_COMMIT"
@@ -77,6 +78,7 @@ if [ "$LATEST_COMMIT" != "$LAST_BUILT" ]; then
     PerformBuild
 
     echo "$LATEST_COMMIT" > "$STATE_FILE"
+	exit 0
 else
     echo "Branch already uptodate . skipping build"
     exit 1;
