@@ -15,6 +15,7 @@ KEYSTORE_PWD="$5"
 PROJECT_PATH="$SCRIPT_DIR/ProjectFiles"
 STATE_FILE="$SCRIPT_DIR/last_commit.txt"
 OUTPUT_FILE="$1"
+IGNORE_CHECK="$6"
 
 PerformBuild(){
 #for now assume build works
@@ -64,15 +65,17 @@ export LATEST_COMMIT_BODY=$(git log -n 1 origin/"$BRANCH_NAME" --pretty=format:%
 
 if [ ! -f "$STATE_FILE" ]; then
   echo "$LATEST_COMMIT" > "$STATE_FILE"
-  echo "Initial commit recorded, skipping build"
-  exit 0
+  if ! $IGNORE_CHECK; then
+    echo "Initial commit recorded, skipping build"
+    exit 0
+  fi
 fi
 
 LAST_BUILT=$(cat "$STATE_FILE")
 echo $LAST_BUILT
 echo $LATEST_COMMIT
 
-if [ "$LATEST_COMMIT" != "$LAST_BUILT" ]; then
+if [ "$LATEST_COMMIT" != "$LAST_BUILT" ] || $IGNORE_CHECK ; then
     echo "New commit detected $LATEST_COMMIT"
     git reset --hard "origin/$BRANCH_NAME"
     PerformBuild

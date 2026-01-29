@@ -4,6 +4,15 @@ set -e
 
 #gcloud auth activate-service-account --key-file=gpservice.json
 #export ACCESS_TOKEN=$(gcloud auth print-access-token)
+
+IGNORE_CHECKS=false
+
+for arg in "$@"; do
+    if [[ "$arg" == "--force" ]]; then
+        IGNORE_CHECKS=true
+    fi
+done
+
 LOCK_FILE="LockFile"
 HandleLock(){
     if [ -f "$LOCK_FILE" ]; then
@@ -112,7 +121,7 @@ echo "PACKAGE_NAME : " $PACKAGE_NAME
 BUILD_NAME="build_$(date +%b_%d_%Y_%I-%M-%S_%p).apk"
 mkdir -p builds
 echo "starting build"
-OUTPUT=$(./BuildUnity.sh "$PWD/builds/$BUILD_NAME" "$UNITY_PATH" "$REPO_URL" "$BRANCH" "$KEYSTORE_PWD" 3>&1)
+OUTPUT=$(./BuildUnity.sh "$PWD/builds/$BUILD_NAME" "$UNITY_PATH" "$REPO_URL" "$BRANCH" "$KEYSTORE_PWD" "$IGNORE_CHECKS" 3>&1)
 if [ $? -eq 0 ]; then
     eval "$OUTPUT"
     chmod a+x ./UploadBuild.sh
