@@ -24,6 +24,75 @@ This repo is tested to work in Fedora Linux (should work fine in any distro) and
    * **PACKAGE_NAME** - your unity package name , same as the one from google play console
   
    * **BRANCH_NAME** - The name of the branch you want to poll for changes
+     
+5. Place this script in your projects Editor folder and set your Keystore file name, Keystore alias and Build profile path (optional)
+
+
+```
+public static class BuildScript
+{
+    public const string KEYSTORE_NAME = "user.keystore";
+    public const string KEYSTORE_ALIAS = "Keystore alias name";
+    public const string BUILD_PROFILE_PATH = string.Empty;
+    
+    public static void BuildAndroid() {
+        // Set the build target to Android
+        UnityEditor.EditorUserBuildSettings.SwitchActiveBuildTarget(UnityEditor.BuildTargetGroup.Android, UnityEditor.BuildTarget.Android);
+
+        //keystore
+        //read pasword from commandline args
+        string[] args = System.Environment.GetCommandLineArgs();
+        string keystorePass = "";
+        string outputPath = "Builds/Android/MyGame.apk";//default path
+        for (int i = 0; i < args.Length; i++) {
+            if (args[i] == "-keystorePass" && i + 1 < args.Length) {
+                keystorePass = args[i + 1];
+            }
+            
+            if((args[i] == "-output" || args[i] == "-buildOutput")&& i + 1 < args.Length) {
+                //where the apk will be saved
+                outputPath = args[i + 1];
+            }
+        }
+        SetBuildProfile();
+        
+        PlayerSettings.Android.useCustomKeystore = true;
+        PlayerSettings.Android.keystoreName = KEYSTORE_NAME;
+        PlayerSettings.Android.keystorePass = keystorePass;
+        PlayerSettings.Android.keyaliasName = KEYSTORE_ALIAS;
+        PlayerSettings.Android.keyaliasPass = keystorePass;
+        
+        // Define the build options
+        
+        UnityEditor.BuildPlayerOptions buildPlayerOptions = new UnityEditor.BuildPlayerOptions();
+        buildPlayerOptions.scenes = EditorBuildSettings.scenes
+            .Where(scene => scene.enabled)
+            .Select(scene => scene.path)
+            .ToArray();;
+        buildPlayerOptions.target = UnityEditor.BuildTarget.Android;
+        buildPlayerOptions.options = UnityEditor.BuildOptions.None;
+        buildPlayerOptions.locationPathName = outputPath;
+        Debug.Log("Building to path " + outputPath);
+        // Build the player
+        UnityEditor.BuildPipeline.BuildPlayer(buildPlayerOptions);
+    }
+
+    private static void SetBuildProfile() {
+        
+        if(string.IsNullOrEmpty( BUILD_PROFILE_PATH)) {
+            Debug.LogWarning("No build profile path set");
+            return;
+        }
+        
+        //load the build profile from Assets/Editor/Automation.asset
+        var profile = AssetDatabase.LoadAssetAtPath<BuildProfile>(BUILD_PROFILE_PATH);
+        if (profile != null) {
+            BuildProfile.SetActiveBuildProfile(profile);
+        }
+    }
+    
+}
+```
   
 5. Test to see if the command works by running `bash StartBuild.sh --force`
 
