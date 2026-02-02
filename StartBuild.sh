@@ -35,6 +35,10 @@ CleanupLock(){
 }
 
 SendDiscordMsg(){
+    if [ -z "$DISCORD_HOOK" ]; then
+        echo "Error: DISCORD_HOOK is not set. Skipping Sending message"
+        return 1
+    fi
     local MESSAGE="$1"
     echo "SEnding message $1"
     curl -H "Content-Type: application/json" \
@@ -80,8 +84,7 @@ EOL
     fi
 
     if [ -z "$DISCORD_HOOK" ]; then
-        echo "Error: DISCORD_HOOK is not set in $CONFIG_FILE"
-        ERRORS=$((ERRORS+1))
+        echo "Error: DISCORD_HOOK is not set in $CONFIG_FILE uploaded build link will only be shard in console"
     fi
     if [ -z "$PACKAGE_NAME" ]; then
         echo "Error: PACKAGE_NAME is not set in $CONFIG_FILE"
@@ -134,7 +137,5 @@ if [ $? -eq 0 ]; then
 
     SendDiscordMsg "$MSG"
 
-    #copy the apk to backups
-    cp
 
 fi

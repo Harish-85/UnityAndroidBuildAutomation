@@ -50,6 +50,10 @@ fi
 
 #building process here
 
+if [ ! -d "ProjectFiles" ]; then
+    mkdir "ProjectFiles"
+fi
+
 cd "$PROJECT_PATH"
 
 if [ ! -d ".git" ]; then
