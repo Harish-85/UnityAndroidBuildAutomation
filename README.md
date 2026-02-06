@@ -19,7 +19,7 @@ This repo is tested to work in Fedora Linux (should work fine in any distro) and
 
    * **REPO_URL** - I recomend using ssh and make sure you are authenticated to run git clone
   
-   * **GP_SERVICE** - Refer the [Fastlane docs' ](https://docs.fastlane.tools/getting-started/android/setup/) ,Collect Your credentials' section to get the gpservice.json file
+   * **GP_SERVICE** - Refer the [Fastlane docs](https://docs.fastlane.tools/getting-started/android/setup/) , 'Collect Your credentials' section for info on how to get the gpservice.json file
   
    * **DISCORD_HOOK** can be obtained by going to your Discord Server Settings -> Integrations -> Webhooks and creating a new one
   
