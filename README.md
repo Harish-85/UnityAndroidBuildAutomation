@@ -41,8 +41,7 @@ public static class BuildScript
         // Set the build target to Android
         UnityEditor.EditorUserBuildSettings.SwitchActiveBuildTarget(UnityEditor.BuildTargetGroup.Android, UnityEditor.BuildTarget.Android);
 
-        //keystore
-        //read pasword from commandline args
+        //read args passed from bash
         string[] args = System.Environment.GetCommandLineArgs();
         string keystorePass = "";
         string outputPath = "Builds/Android/MyGame.apk";//default path
@@ -64,7 +63,6 @@ public static class BuildScript
         PlayerSettings.Android.keyaliasName = KEYSTORE_ALIAS;
         PlayerSettings.Android.keyaliasPass = keystorePass;
         
-        // Define the build options
         
         UnityEditor.BuildPlayerOptions buildPlayerOptions = new UnityEditor.BuildPlayerOptions();
         buildPlayerOptions.scenes = EditorBuildSettings.scenes
@@ -75,18 +73,19 @@ public static class BuildScript
         buildPlayerOptions.options = UnityEditor.BuildOptions.None;
         buildPlayerOptions.locationPathName = outputPath;
         Debug.Log("Building to path " + outputPath);
-        // Build the player
+        // Build the apk
         UnityEditor.BuildPipeline.BuildPlayer(buildPlayerOptions);
     }
 
+    //This only works in unity 6 or higher. even without this the build will work. 
     private static void SetBuildProfile() {
         
         if(string.IsNullOrEmpty( BUILD_PROFILE_PATH)) {
             Debug.LogWarning("No build profile path set");
             return;
         }
-        
-        //load the build profile from Assets/Editor/Automation.asset
+
+
         var profile = AssetDatabase.LoadAssetAtPath<BuildProfile>(BUILD_PROFILE_PATH);
         if (profile != null) {
             BuildProfile.SetActiveBuildProfile(profile);
